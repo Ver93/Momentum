@@ -1,145 +1,70 @@
 
-export function buildProgression(
-    logs,
-    selectedExercise,
-    selectedWorkout
-) {
-    if (!selectedExercise || !selectedWorkout) return []
+export default function StatisticsOverview({
+    stats,
+    weightProgress
+}) {
+    const formatNumber = value =>
+        Math.round(value).toLocaleString('en-GB')
 
-    const result = []
-    const selectedKey = getExerciseKey(selectedExercise)
+    const formatWeight = value =>
+        `${Number(value || 0).toFixed(2)} kg`
 
-    logs.forEach(log => {
-        const workoutKey = log.workout_id
-            ? `id:${log.workout_id}`
-            : `name:${(log.workout_name || 'Unnamed workout').toLowerCase()}`
+    return (
+        <section className="statistics-grid">
 
-        if (workoutKey !== selectedWorkout) return
+            <article className="statistics-card">
+                <p>Best weight</p>
+                <h2>{formatWeight(stats.bestWeight)}</h2>
+                <span className="statistics-card-sub">
+                    Heaviest set
+                </span>
+            </article>
 
-        const entries = (log.workout_exercises || []).filter(
-            exercise =>
-                getExerciseKey(exercise.exercise_name) === selectedKey
-        )
+            <article className="statistics-card">
+                <p>Total sets</p>
+                <h2>{formatNumber(stats.totalSets)}</h2>
+                <span className="statistics-card-sub">
+                    Sets completed
+                </span>
+            </article>
 
-        if (!entries.length) return
+            <article className="statistics-card">
+                <p>Total reps</p>
+                <h2>{formatNumber(stats.totalReps ?? stats.bestReps ?? 0)}</h2>
+                <span className="statistics-card-sub">
+                    Repetitions completed
+                </span>
+            </article>
 
-        const allSets = entries.flatMap(exercise =>
-            Array.isArray(exercise.sets) ? exercise.sets : []
-        )
+            <article className="statistics-card">
+                <p>Total volume</p>
+                <h2>{formatNumber(stats.totalVolume)} kg</h2>
+                <span className="statistics-card-sub">
+                    Kilograms lifted
+                </span>
+            </article>
 
-        const validSets = allSets.map(set => ({
-            reps: Math.max(0, Number(set.reps) || 0),
-            weight: Math.max(0, Number(set.weight) || 0)
-        })).filter(set => set.reps > 0)
+            <article className="statistics-card">
+                <p>Absolute weight increase</p>
+                <h2>
+                    {weightProgress.increase > 0 ? '+' : ''}
+                    {formatWeight(weightProgress.increase)}
+                </h2>
+                <span className="statistics-card-sub">
+                    Since first recorded session
+                </span>
+            </article>
 
-        if (!validSets.length) return
+            <article className="statistics-card">
+                <p>Weight increase (%)</p>
+                <h2>
+                    {weightProgress.percentage.toFixed(1)}%
+                </h2>
+                <span className="statistics-card-sub">
+                    Compared with starting weight
+                </span>
+            </article>
 
-        const totalReps = validSets.reduce(
-            (sum, set) => sum + set.reps,
-            0
-        )
-
-        const totalVolume = validSets.reduce(
-            (sum, set) => sum + set.reps * set.weight,
-            0
-        )
-
-        const maxWeight = Math.max(
-            ...validSets.map(set => set.weight)
-        )
-
-        const averageWeight = validSets.reduce(
-            (sum, set) => sum + set.weight,
-            0
-        ) / validSets.length
-
-        result.push({
-            id: log.id,
-            date: log.completed_at,
-
-            label: new Date(log.completed_at).toLocaleDateString(
-                'en-GB',
-                { day: 'numeric', month: 'short' }
-            ),
-
-            sets: validSets.length,
-            reps: totalReps,
-            weight: maxWeight,
-            averageWeight,
-            volume: totalVolume
-        })
-    })
-
-    return result.sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
+        </section>
     )
-}
-
-export function calculateStatistics(progression) {
-    if (!progression.length) {
-        return {
-            sessions: 0,
-            bestWeight: 0,
-            latestWeight: 0,
-            firstWeight: 0,
-            weightIncrease: 0,
-            totalSets: 0,
-            totalReps: 0,
-            totalVolume: 0,
-            bestVolume: 0,
-            bestReps: 0,
-            averageWeight: 0
-        }
-    }
-
-    const firstWeight = progression[0].weight
-    const latestWeight = progression[progression.length - 1].weight
-
-    const totalSets = progression.reduce(
-        (sum, item) => sum + item.sets,
-        0
-    )
-
-    const totalReps = progression.reduce(
-        (sum, item) => sum + item.reps,
-        0
-    )
-
-    const totalVolume = progression.reduce(
-        (sum, item) => sum + item.volume,
-        0
-    )
-
-    const totalWeightedSets = progression.reduce(
-        (sum, item) => sum + item.averageWeight * item.sets,
-        0
-    )
-
-    return {
-        sessions: progression.length,
-
-        bestWeight: Math.max(
-            ...progression.map(item => item.weight)
-        ),
-
-        latestWeight,
-        firstWeight,
-        weightIncrease: latestWeight - firstWeight,
-
-        totalSets,
-        totalReps,
-        totalVolume,
-
-        bestVolume: Math.max(
-            ...progression.map(item => item.volume)
-        ),
-
-        bestReps: Math.max(
-            ...progression.map(item => item.reps)
-        ),
-
-        averageWeight: totalSets
-            ? totalWeightedSets / totalSets
-            : 0
-    }
 }
