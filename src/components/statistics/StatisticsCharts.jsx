@@ -40,13 +40,6 @@ const charts = [
         suffix: ' kg',
         color: '#ffb86b'
     },
-    {
-        key: 'averageWeight',
-        title: 'Average weight',
-        description: 'Average weight per set',
-        suffix: ' kg',
-        color: '#ff8da1'
-    }
 ]
 
 export default function StatisticsCharts({ progression }) {

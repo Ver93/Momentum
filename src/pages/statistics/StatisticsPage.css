@@ -478,6 +478,18 @@
     }
 }
 
+
+/* POSITIVE AND NEGATIVE PROGRESSION */
+
+.increase-positive {
+    color: #a3e635 !important;
+}
+
+.increase-negative {
+    color: #ff6464 !important;
+}
+
+
 /* ========================================
    SMALL MOBILE
 ======================================== */

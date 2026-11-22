@@ -100,8 +100,15 @@ export default function StatisticsPage({ session }) {
 
     // ABSOLUTE WEIGHT PROGRESSION
 
+
     const weightProgress = useMemo(() => {
-        if (!progression.length) {
+        const allProgression = buildProgression(
+            logs,
+            selectedExercise,
+            selectedWorkout
+        )
+
+        if (allProgression.length < 1) {
             return {
                 startWeight: 0,
                 currentWeight: 0,
@@ -110,15 +117,10 @@ export default function StatisticsPage({ session }) {
             }
         }
 
-        const sorted = [...progression].sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
-        )
+        const startWeight = allProgression[0].weight
 
-        const startWeight = Number(sorted[0].weight) || 0
-
-        const currentWeight = Number(
-            sorted[sorted.length - 1].weight
-        ) || 0
+        const currentWeight =
+            allProgression[allProgression.length - 1].weight
 
         const increase = currentWeight - startWeight
 
@@ -132,7 +134,37 @@ export default function StatisticsPage({ session }) {
             increase,
             percentage
         }
-    }, [progression])
+    }, [logs, selectedExercise, selectedWorkout])
+
+
+    const progressionIncrease = useMemo(() => {
+        const allProgression = buildProgression(
+            logs,
+            selectedExercise,
+            selectedWorkout
+        )
+
+        if (allProgression.length < 2) {
+            return {
+                reps: 0,
+                weight: 0,
+                sets: 0,
+                volume: 0
+            }
+        }
+
+        const first = allProgression[0]
+        const latest = allProgression[allProgression.length - 1]
+
+        return {
+            reps: latest.reps - first.reps,
+            weight: latest.weight - first.weight,
+            sets: latest.sets - first.sets,
+            volume: latest.volume - first.volume
+        }
+    }, [logs, selectedExercise, selectedWorkout])
+
+
 
     // FORMATTERS
 
@@ -180,9 +212,9 @@ export default function StatisticsPage({ session }) {
 
             <header className="statistics-header">
                 <div>
-                    <span className="statistics-eyebrow">
+                    {/* <span className="statistics-eyebrow">
                         PERFORMANCE OVERVIEW
-                    </span>
+                    </span> */}
 
                     <h1>Statistics</h1>
 
@@ -237,64 +269,15 @@ export default function StatisticsPage({ session }) {
 
                     {/* OVERVIEW */}
 
-                    <StatisticsOverview
+                    {/* <StatisticsOverview
                         stats={stats}
                         weightProgress={weightProgress}
+                    /> */}
+
+                    <StatisticsOverview
+                        stats={stats}
+                        progressionIncrease={progressionIncrease}
                     />
-
-                    {/* WEIGHT INCREASE */}
-
-                    <section className="statistics-section">
-                        <div className="statistics-section-heading">
-                            <div>
-                                <h2>Absolute weight increase</h2>
-                                <p>
-                                    Difference between your first and latest
-                                    recorded session
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="statistics-grid">
-
-                            <article className="statistics-card">
-                                <p>Starting weight</p>
-                                <h2>
-                                    {formatWeight(
-                                        weightProgress.startWeight
-                                    )}
-                                </h2>
-                            </article>
-
-                            <article className="statistics-card">
-                                <p>Current weight</p>
-                                <h2>
-                                    {formatWeight(
-                                        weightProgress.currentWeight
-                                    )}
-                                </h2>
-                            </article>
-
-                            <article className="statistics-card">
-                                <p>Total increase</p>
-                                <h2>
-                                    {weightProgress.increase > 0 ? '+' : ''}
-                                    {formatWeight(
-                                        weightProgress.increase
-                                    )}
-                                </h2>
-                            </article>
-
-                            <article className="statistics-card">
-                                <p>Percentage increase</p>
-                                <h2>
-                                    {weightProgress.percentage > 0 ? '+' : ''}
-                                    {weightProgress.percentage.toFixed(1)}%
-                                </h2>
-                            </article>
-
-                        </div>
-                    </section>
 
                     {/* PROGRESSION CHARTS */}
 
