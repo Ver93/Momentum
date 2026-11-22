@@ -5,62 +5,96 @@ import './WorkoutRunner.css'
 
 export default function WorkoutRunner({ workout, onExit }) {
 
-    // AUDIO
+    // AUDIO FILES
     const audioPaths = {
         countdown: '/momentum/sounds/countdown.mp3',
         start: '/momentum/sounds/start.mp3',
         finish: '/momentum/sounds/finish.mp3'
     }
 
-    const audioRef = useRef({})
-    const activeAudioRef = useRef(null)
+    // WEB AUDIO API
+    const audioContextRef = useRef(null)
+    const audioBuffersRef = useRef({})
+    const activeSourceRef = useRef(null)
+    const audioReadyRef = useRef(null)
 
-    // PRELOAD ALL AUDIO
+    // INITIALIZE AUDIO AND PRELOAD BUFFERS
     useEffect(() => {
-        Object.entries(audioPaths).forEach(([name, path]) => {
-            const audio = new Audio()
+        const AudioContextClass =
+            window.AudioContext || window.webkitAudioContext
 
-            audio.src = path
-            audio.preload = 'auto'
-            audio.load()
+        if (!AudioContextClass) {
+            console.error('Web Audio API is not supported.')
+            return
+        }
 
-            audioRef.current[name] = audio
+        const context = new AudioContextClass({
+            latencyHint: 'interactive'
         })
 
-        return () => {
-            Object.values(audioRef.current).forEach(audio => {
-                audio.pause()
-                audio.removeAttribute('src')
-                audio.load()
-            })
+        audioContextRef.current = context
 
-            audioRef.current = {}
-            activeAudioRef.current = null
+        audioReadyRef.current = Promise.all(
+            Object.entries(audioPaths).map(async ([name, path]) => {
+                try {
+                    const response = await fetch(path)
+
+                    if (!response.ok) {
+                        throw new Error(`Could not load ${path}`)
+                    }
+
+                    const arrayBuffer = await response.arrayBuffer()
+                    const buffer = await context.decodeAudioData(arrayBuffer)
+
+                    audioBuffersRef.current[name] = buffer
+
+                } catch (error) {
+                    console.error(`Audio loading failed (${name}):`, error)
+                }
+            })
+        )
+
+        return () => {
+            if (activeSourceRef.current) {
+                try {
+                    activeSourceRef.current.stop()
+                } catch {}
+            }
+
+            context.close()
+
+            audioContextRef.current = null
+            activeSourceRef.current = null
+            audioBuffersRef.current = {}
         }
     }, [])
 
-    // PLAY SOUND
+    // PLAY SOUND INSTANTLY
     const playSound = name => {
-        const audio = audioRef.current[name]
+        const context = audioContextRef.current
+        const buffer = audioBuffersRef.current[name]
 
-        if (!audio) return
+        if (!context || !buffer || context.state !== 'running') {
+            return
+        }
 
         // Stop previous sound
-        if (activeAudioRef.current) {
-            activeAudioRef.current.pause()
-            activeAudioRef.current.currentTime = 0
+        if (activeSourceRef.current) {
+            try {
+                activeSourceRef.current.stop()
+            } catch {}
         }
 
-        audio.currentTime = 0
-        activeAudioRef.current = audio
+        // Create audio source from preloaded memory
+        const source = context.createBufferSource()
 
-        const playPromise = audio.play()
+        source.buffer = buffer
+        source.connect(context.destination)
 
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn(`Could not play ${name}:`, error)
-            })
-        }
+        activeSourceRef.current = source
+
+        // Schedule immediately
+        source.start(0)
     }
 
     // BUILD TIMELINE
@@ -198,16 +232,16 @@ export default function WorkoutRunner({ workout, onExit }) {
 
             setRemaining(nextRemaining)
 
-            // No countdown beeps on last module
+            // No countdown sounds on last module
             if (isLastStep) return
 
-            // Countdown module: beep every second
+            // Countdown: sound every second
             if (current.type === 'countdown') {
                 playSound('countdown')
                 return
             }
 
-            // Work / Rest: beep at 3, 2 and 1
+            // Work / Rest: sound at 3, 2 and 1
             if ([3, 2, 1].includes(nextRemaining)) {
                 playSound('countdown')
             }
@@ -227,10 +261,35 @@ export default function WorkoutRunner({ workout, onExit }) {
     ])
 
     // START / PAUSE
-    const toggleTimer = () => {
+    const toggleTimer = async () => {
         if (completed || !current || isSaving) return
 
-        setIsRunning(value => !value)
+        if (isRunning) {
+            setIsRunning(false)
+            return
+        }
+
+        try {
+            const context = audioContextRef.current
+
+            // Unlock audio immediately from user interaction
+            const resumePromise = context?.state === 'suspended'
+                ? context.resume()
+                : Promise.resolve()
+
+            // Wait for audio files to finish decoding
+            if (audioReadyRef.current) {
+                await audioReadyRef.current
+            }
+
+            await resumePromise
+
+            setIsRunning(true)
+
+        } catch (error) {
+            console.error('Could not initialize audio:', error)
+            setIsRunning(true)
+        }
     }
 
     // NEXT MODULE
@@ -251,10 +310,12 @@ export default function WorkoutRunner({ workout, onExit }) {
     const restart = () => {
         if (isSaving) return
 
-        if (activeAudioRef.current) {
-            activeAudioRef.current.pause()
-            activeAudioRef.current.currentTime = 0
-            activeAudioRef.current = null
+        if (activeSourceRef.current) {
+            try {
+                activeSourceRef.current.stop()
+            } catch {}
+
+            activeSourceRef.current = null
         }
 
         setIsRunning(false)
