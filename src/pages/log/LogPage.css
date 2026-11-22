@@ -1,0 +1,492 @@
+
+.log-page {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    color: white;
+    box-sizing: border-box;
+}
+
+/* Header */
+
+.log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.log-header h1 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.log-header p {
+    margin: 5px 0 0;
+    color: #92998b;
+    font-size: 13px;
+}
+
+.log-add-button {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 4px;
+    background: #b7f36b;
+    color: #151515;
+    font-size: 28px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.log-add-button:hover {
+    background: #c8ff83;
+}
+
+/* Loading */
+
+.log-loading {
+    color: #999;
+}
+
+/* Workout cards */
+
+.log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.log-card {
+    overflow: hidden;
+    border: 1px solid #30372c;
+    border-radius: 5px;
+    background: #1c211a;
+}
+
+.log-card.expanded {
+    border-color: #65784e;
+}
+
+/* Card header */
+
+.log-card-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 65px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 13px;
+    border: none;
+    background: transparent;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.log-card-toggle:hover {
+    background: #232820;
+}
+
+.log-card-info h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.log-card-info > p {
+    margin: 3px 0 0;
+    color: #92998b;
+    font-size: 11px;
+}
+
+/* Card metadata */
+
+.log-card-meta {
+    display: flex;
+    gap: 6px;
+    margin-top: 7px;
+}
+
+.log-card-meta span {
+    padding: 3px 6px;
+    border: 1px solid #394333;
+    border-radius: 3px;
+    background: #252d21;
+    color: #b7f36b;
+    font-size: 10px;
+}
+
+/* Expand button */
+
+.log-card-actions {
+    margin-left: 10px;
+}
+
+.log-chevron {
+    display: flex;
+    width: 27px;
+    height: 27px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #414a39;
+    border-radius: 4px;
+    color: #b7f36b;
+    font-size: 17px;
+}
+
+.log-card.expanded .log-chevron {
+    background: #b7f36b;
+    color: #151515;
+}
+
+/* Expanded content */
+
+.log-card-content {
+    padding: 0 13px 12px;
+    border-top: 1px solid #353d30;
+}
+
+/* Saved exercises */
+
+.log-saved-exercise {
+    padding: 10px 0;
+    border-bottom: 1px solid #30362c;
+}
+
+.log-saved-exercise strong {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.log-saved-sets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.log-saved-sets span {
+    padding: 5px 7px;
+    border: 1px solid #46523b;
+    border-radius: 3px;
+    background: #293123;
+    color: #b7f36b;
+    font-size: 10px;
+}
+
+.log-no-exercises {
+    color: #999;
+    font-size: 11px;
+}
+
+/* Delete workout */
+
+.log-delete-button {
+    margin-top: 10px;
+    padding: 6px 9px;
+    border: 1px solid #49312e;
+    border-radius: 3px;
+    background: transparent;
+    color: #e77b72;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.log-delete-button:hover {
+    background: #38201e;
+}
+
+/* Reset */
+
+.log-reset-button {
+    margin-top: 15px;
+    padding: 8px 11px;
+    border: 1px solid #49312e;
+    border-radius: 3px;
+    background: transparent;
+    color: #e77b72;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.log-reset-button:disabled {
+    opacity: 0.5;
+}
+
+/* Empty state */
+
+.log-empty {
+    padding: 30px 15px;
+    border: 1px dashed #353b31;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.log-empty p {
+    margin: 0 0 6px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.log-empty span {
+    color: #92998b;
+    font-size: 12px;
+}
+
+/* Modal */
+
+.log-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 20px 14px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+}
+
+.log-form {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+    padding: 22px;
+    border: 1px solid #343a30;
+    border-radius: 4px;
+    background: #191e18;
+    color: white;
+    box-sizing: border-box;
+}
+
+.log-form h2 {
+    margin: 0;
+    font-size: 21px;
+}
+
+.log-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.log-form-header button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #3a4036;
+    border-radius: 3px;
+    background: #252b23;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.log-form label {
+    display: block;
+    margin: 18px 0 7px;
+    color: #aaa;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.log-form input {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 11px;
+    box-sizing: border-box;
+    border: 1px solid #3a4036;
+    border-radius: 3px;
+    outline: none;
+    background: #10140f;
+    color: white;
+    font-size: 16px;
+}
+
+.log-form input:focus {
+    border-color: #b7f36b;
+}
+
+.log-form input[type="date"] {
+    color-scheme: dark;
+}
+
+/* Exercises */
+
+.log-exercises {
+    margin-top: 26px;
+}
+
+.log-exercises h3 {
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.log-exercise {
+    margin: 12px 0;
+    padding: 15px;
+    border: 1px solid #353b31;
+    border-radius: 3px;
+    background: #20251e;
+}
+
+.log-exercise-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 13px;
+    font-size: 12px;
+}
+
+.log-exercise-header span {
+    color: #b7f36b;
+    font-weight: 700;
+}
+
+.log-exercise-header button {
+    border: none;
+    background: transparent;
+    color: #e77b72;
+    cursor: pointer;
+}
+
+/* Sets */
+
+.log-set-labels,
+.log-set-row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr) 25px;
+    align-items: center;
+    gap: 8px;
+}
+
+.log-set-labels {
+    margin: 16px 0 8px;
+    color: #92998b;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.log-set-row {
+    margin-bottom: 9px;
+}
+
+.log-set-row > span {
+    color: #b7f36b;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.log-set-row input {
+    min-height: 42px;
+    padding: 8px 3px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.log-set-row button {
+    border: none;
+    background: transparent;
+    color: #e77b72;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.log-set-row button:disabled {
+    opacity: 0.25;
+}
+
+/* Add buttons */
+
+.log-add-set,
+.log-add-exercise {
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: #b7f36b;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.log-add-exercise {
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    border: 1px dashed #536348;
+    border-radius: 3px;
+}
+
+/* Save */
+
+.log-save-button {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 3px;
+    background: #b7f36b;
+    color: #151515;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.log-save-button:disabled,
+.log-form-header button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Errors */
+
+.log-error {
+    padding: 12px;
+    border: 1px solid #633b36;
+    border-radius: 3px;
+    background: #38201e;
+    color: #ffaaa0;
+    font-size: 13px;
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+    .log-page {
+        padding: 16px;
+    }
+
+    .log-form {
+        padding: 17px;
+    }
+
+    .log-modal-overlay {
+        padding: 12px;
+    }
+
+    .log-card-toggle {
+        padding: 10px;
+    }
+
+    .log-card-content {
+        padding: 0 10px 10px;
+    }
+
+    .log-header {
+        margin-bottom: 16px;
+    }
+}
+
+@media (min-width: 600px) {
+    .log-modal-overlay {
+        align-items: center;
+    }
+}

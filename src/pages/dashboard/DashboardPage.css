@@ -1,0 +1,212 @@
+
+.dashboard-page {
+  width: 100%;
+  padding: 32px;
+}
+
+.dashboard-page h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+
+/* =================================
+   DASHBOARD WORKOUTS
+================================= */
+
+.dashboard-workouts {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 26px;
+}
+
+.dashboard-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-section-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.dashboard-section-heading p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.dashboard-workout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-workout-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+}
+
+.dashboard-workout-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-workout-top h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-workout-top span {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.dashboard-workout-time {
+  flex-shrink: 0;
+  font-size: 17px !important;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-timeline {
+  display: flex;
+  width: 100%;
+  height: 30px;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.dashboard-timeline-segment {
+  min-width: 3px;
+  border-radius: 3px;
+}
+
+.dashboard-timeline-segment.work {
+  background: #16a34a;
+}
+
+.dashboard-timeline-segment.rest {
+  background: #2563eb;
+}
+
+.dashboard-no-modules {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.dashboard-workout-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dashboard-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.dashboard-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.legend-work-dot {
+  background: #16a34a;
+}
+
+.legend-rest-dot {
+  background: #2563eb;
+}
+
+.dashboard-use-button {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.dashboard-use-button:active {
+  background: var(--bg-primary);
+}
+
+.dashboard-use-button:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.dashboard-use-button span {
+  font-size: 19px;
+}
+
+.dashboard-empty {
+  min-height: 130px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.dashboard-empty strong {
+  color: var(--text-primary);
+}
+
+.dashboard-empty button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+
+@media (max-width: 767px) {
+  .dashboard-page {
+    padding: 20px;
+  }
+}

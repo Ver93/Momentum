@@ -1,0 +1,364 @@
+
+.workout-runner {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.runner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.runner-back,
+.runner-restart {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.runner-workout-title {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.runner-workout-title strong {
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.runner-workout-title span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* PROGRESS */
+
+.runner-progress {
+  width: 100%;
+  display: flex;
+  gap: 4px;
+}
+
+.runner-progress-segment {
+  height: 7px;
+  min-width: 2px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.runner-progress-segment.work.completed,
+.runner-progress-segment.work.current {
+  background: #16a34a;
+}
+
+.runner-progress-segment.rest.completed,
+.runner-progress-segment.rest.current {
+  background: #2563eb;
+}
+
+.runner-progress-segment.countdown.completed,
+.runner-progress-segment.countdown.current {
+  background: #d97706;
+}
+
+/* MAIN TIMER */
+
+.runner-main {
+  min-height: 330px;
+  padding: 28px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.runner-main.is-work {
+  background: rgba(22, 163, 74, .07);
+  border-color: rgba(22, 163, 74, .35);
+}
+
+.runner-main.is-rest {
+  background: rgba(37, 99, 235, .07);
+  border-color: rgba(37, 99, 235, .35);
+}
+
+.runner-main.is-countdown {
+  background: rgba(217, 119, 6, .07);
+  border-color: rgba(217, 119, 6, .35);
+}
+
+.runner-type {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.is-work .runner-type {
+  color: #16a34a;
+}
+
+.is-rest .runner-type {
+  color: #2563eb;
+}
+
+.is-countdown .runner-type {
+  color: #d97706;
+}
+
+.runner-main h1 {
+  margin: 0;
+  font-size: 25px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.runner-timer {
+  font-size: clamp(64px, 18vw, 100px);
+  line-height: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.06em;
+}
+
+.runner-timer-progress {
+  width: 100%;
+  max-width: 260px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--border);
+}
+
+.runner-timer-progress > div {
+  height: 100%;
+  transition: width .3s linear;
+}
+
+.is-work .runner-timer-progress > div {
+  background: #16a34a;
+}
+
+.is-rest .runner-timer-progress > div {
+  background: #2563eb;
+}
+
+.is-countdown .runner-timer-progress > div {
+  background: #d97706;
+}
+
+.runner-duration-label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* NEXT MODULE */
+
+.runner-next {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.runner-next > span {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.runner-next-card {
+  min-height: 65px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-secondary);
+  box-sizing: border-box;
+}
+
+.runner-next-card > div:not(.runner-next-dot) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.runner-next-card span {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.runner-next-dot {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.runner-next-dot.work {
+  background: #16a34a;
+}
+
+.runner-next-dot.rest {
+  background: #2563eb;
+}
+
+.runner-next-dot.countdown {
+  background: #d97706;
+}
+
+/* CONTROLS */
+
+.runner-controls {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  gap: 10px;
+}
+
+.runner-primary-button,
+.runner-secondary-button {
+  min-height: 49px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: opacity .15s ease, background .15s ease;
+}
+
+.runner-primary-button {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.runner-secondary-button {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 19px;
+}
+
+.runner-secondary-button:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+/* EXIT */
+
+.runner-exit {
+  min-height: 42px;
+  border: none;
+  background: transparent;
+  color: #dc5555;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* COMPLETED / EMPTY */
+
+.runner-completed,
+.runner-empty {
+  flex: 1;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  text-align: center;
+}
+
+.runner-completed h1,
+.runner-empty h2 {
+  margin: 0;
+}
+
+.runner-completed p,
+.runner-empty p {
+  color: var(--text-muted);
+}
+
+.runner-completed-icon {
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(22, 163, 74, .12);
+  color: #16a34a;
+  font-size: 36px;
+}
+
+.runner-completed button {
+  width: 100%;
+  max-width: 300px;
+}
+
+.runner-completed .runner-secondary-button {
+  background: transparent;
+}
+
+/* MOBILE */
+
+@media (max-width: 360px) {
+  .workout-runner {
+    padding: 12px;
+    gap: 17px;
+  }
+
+  .runner-main {
+    min-height: 290px;
+  }
+
+  .runner-timer {
+    font-size: 64px;
+  }
+}
+
+/* DESKTOP */
+
+@media (min-width: 768px) {
+  .workout-runner {
+    padding: 24px;
+  }
+
+  .runner-main {
+    min-height: 380px;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-runner *,
+  .workout-runner *::before,
+  .workout-runner *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
