@@ -7,9 +7,9 @@ export default function WorkoutRunner({ workout, onExit }) {
 
     // AUDIO
     const audioPaths = {
-        countdown: '/sounds/countdown.mp3',
-        start: '/sounds/start.mp3',
-        finish: '/sounds/finish.mp3'
+        countdown: '/momentum/sounds/countdown.mp3',
+        start: '/momentum/sounds/start.mp3',
+        finish: '/momentum/sounds/finish.mp3'
     }
 
     const audioRef = useRef(null)
