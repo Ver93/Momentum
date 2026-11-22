@@ -12,89 +12,161 @@ export default function WorkoutRunner({ workout, onExit }) {
         finish: '/momentum/sounds/finish.mp3'
     }
 
-    // WEB AUDIO API
-    const audioContextRef = useRef(null)
-    const audioBuffersRef = useRef({})
-    const activeSourceRef = useRef(null)
-    const audioReadyRef = useRef(null)
+    // AUDIO REFERENCES
+    const audioRef = useRef({})
+    const activeAudioRef = useRef(null)
+    const audioReadyRef = useRef(false)
+    const audioUnlockedRef = useRef(false)
 
-    // INITIALIZE AUDIO AND PRELOAD BUFFERS
+    // TIMER REFERENCES
+    const endTimeRef = useRef(null)
+    const lastSecondRef = useRef(null)
+    const wakeLockRef = useRef(null)
+
+    const completedRef = useRef(false)
+    const runningRef = useRef(false)
+    const currentIndexRef = useRef(0)
+    const isSavingRef = useRef(false)
+
+    // PRELOAD AUDIO
     useEffect(() => {
-        const AudioContextClass =
-            window.AudioContext || window.webkitAudioContext
+        let mounted = true
 
-        if (!AudioContextClass) {
-            console.error('Web Audio API is not supported.')
-            return
-        }
+        Object.entries(audioPaths).forEach(([name, path]) => {
+            const audio = new Audio(path)
 
-        const context = new AudioContextClass({
-            latencyHint: 'interactive'
+            audio.preload = 'auto'
+            audio.load()
+
+            audioRef.current[name] = audio
         })
 
-        audioContextRef.current = context
+        const preloadAudio = async () => {
+            const players = Object.values(audioRef.current)
 
-        audioReadyRef.current = Promise.all(
-            Object.entries(audioPaths).map(async ([name, path]) => {
-                try {
-                    const response = await fetch(path)
-
-                    if (!response.ok) {
-                        throw new Error(`Could not load ${path}`)
+            await Promise.all(
+                players.map(audio => {
+                    if (audio.readyState >= 3) {
+                        return Promise.resolve()
                     }
 
-                    const arrayBuffer = await response.arrayBuffer()
-                    const buffer = await context.decodeAudioData(arrayBuffer)
+                    return new Promise(resolve => {
+                        const done = () => resolve()
 
-                    audioBuffersRef.current[name] = buffer
+                        audio.addEventListener('canplaythrough', done, {
+                            once: true
+                        })
 
-                } catch (error) {
-                    console.error(`Audio loading failed (${name}):`, error)
-                }
-            })
-        )
+                        audio.addEventListener('error', done, {
+                            once: true
+                        })
+
+                        setTimeout(done, 5000)
+                    })
+                })
+            )
+
+            if (mounted) {
+                audioReadyRef.current = true
+            }
+        }
+
+        preloadAudio()
 
         return () => {
-            if (activeSourceRef.current) {
-                try {
-                    activeSourceRef.current.stop()
-                } catch {}
-            }
+            mounted = false
 
-            context.close()
+            Object.values(audioRef.current).forEach(audio => {
+                audio.pause()
+                audio.removeAttribute('src')
+                audio.load()
+            })
 
-            audioContextRef.current = null
-            activeSourceRef.current = null
-            audioBuffersRef.current = {}
+            audioRef.current = {}
         }
     }, [])
 
-    // PLAY SOUND INSTANTLY
+    // UNLOCK AUDIO
+    const unlockAudio = async () => {
+        if (audioUnlockedRef.current) return
+
+        const players = Object.values(audioRef.current)
+
+        try {
+            await Promise.all(
+                players.map(async audio => {
+                    audio.muted = true
+                    audio.currentTime = 0
+
+                    try {
+                        await audio.play()
+                        audio.pause()
+                        audio.currentTime = 0
+                    } catch (error) {
+                        console.warn('Audio unlock failed:', error)
+                    }
+
+                    audio.muted = false
+                })
+            )
+
+            audioUnlockedRef.current = true
+
+        } catch (error) {
+            console.warn('Could not unlock audio:', error)
+        }
+    }
+
+    // PLAY SOUND
     const playSound = name => {
-        const context = audioContextRef.current
-        const buffer = audioBuffersRef.current[name]
+        const audio = audioRef.current[name]
 
-        if (!context || !buffer || context.state !== 'running') {
-            return
+        if (!audio) return
+
+        if (
+            activeAudioRef.current &&
+            activeAudioRef.current !== audio
+        ) {
+            activeAudioRef.current.pause()
+            activeAudioRef.current.currentTime = 0
         }
 
-        // Stop previous sound
-        if (activeSourceRef.current) {
-            try {
-                activeSourceRef.current.stop()
-            } catch {}
+        audio.pause()
+
+        try {
+            audio.currentTime = 0
+        } catch {}
+
+        activeAudioRef.current = audio
+
+        const promise = audio.play()
+
+        if (promise) {
+            promise.catch(error => {
+                console.warn(`Could not play ${name}:`, error)
+            })
         }
+    }
 
-        // Create audio source from preloaded memory
-        const source = context.createBufferSource()
+    // WAKE LOCK
+    const requestWakeLock = async () => {
+        if (!('wakeLock' in navigator)) return
 
-        source.buffer = buffer
-        source.connect(context.destination)
+        try {
+            wakeLockRef.current = await navigator.wakeLock.request('screen')
+        } catch (error) {
+            console.warn('Wake Lock unavailable:', error)
+        }
+    }
 
-        activeSourceRef.current = source
+    const releaseWakeLock = async () => {
+        if (!wakeLockRef.current) return
 
-        // Schedule immediately
-        source.start(0)
+        try {
+            await wakeLockRef.current.release()
+        } catch {}
+
+        wakeLockRef.current = null
     }
 
     // BUILD TIMELINE
@@ -110,10 +182,7 @@ export default function WorkoutRunner({ workout, onExit }) {
 
                     if (duration <= 1) return
 
-                    if (
-                        module.type === 'countdown' &&
-                        roundIndex > 0
-                    ) {
+                    if (module.type === 'countdown' && roundIndex > 0) {
                         return
                     }
 
@@ -147,15 +216,28 @@ export default function WorkoutRunner({ workout, onExit }) {
 
     const isLastStep = currentIndex === steps.length - 1
 
-    // TIMER RESET
+    // KEEP REFS UPDATED
     useEffect(() => {
-        setRemaining(steps[currentIndex]?.duration || 0)
-    }, [currentIndex, steps])
+        runningRef.current = isRunning
+    }, [isRunning])
+
+    useEffect(() => {
+        currentIndexRef.current = currentIndex
+    }, [currentIndex])
+
+    useEffect(() => {
+        isSavingRef.current = isSaving
+    }, [isSaving])
+
+    useEffect(() => {
+        completedRef.current = completed
+    }, [completed])
 
     // SAVE WORKOUT
     const saveWorkoutLog = async () => {
-        if (hasSaved || isSaving) return
+        if (hasSaved || isSavingRef.current) return
 
+        isSavingRef.current = true
         setIsSaving(true)
         setSaveError('')
 
@@ -188,108 +270,197 @@ export default function WorkoutRunner({ workout, onExit }) {
 
             setHasSaved(true)
             setCompleted(true)
+            completedRef.current = true
+
+            runningRef.current = false
             setIsRunning(false)
+
+            releaseWakeLock()
 
         } catch (error) {
             console.error('Could not save workout:', error)
             setSaveError('Could not save workout. Please try again.')
         } finally {
+            isSavingRef.current = false
             setIsSaving(false)
         }
     }
 
     // FINISH WORKOUT
     const finishWorkout = () => {
+        if (completedRef.current) return
+
+        runningRef.current = false
         setIsRunning(false)
+
+        endTimeRef.current = null
+
         playSound('finish')
         saveWorkoutLog()
     }
 
     // MOVE TO NEXT MODULE
     const advanceModule = () => {
-        if (isLastStep) {
+        if (completedRef.current || isSavingRef.current) return
+
+        const index = currentIndexRef.current
+
+        if (index >= steps.length - 1) {
             finishWorkout()
             return
         }
 
         playSound('start')
 
-        setCurrentIndex(index => index + 1)
+        const nextIndex = index + 1
+        const duration = steps[nextIndex].duration
+
+        currentIndexRef.current = nextIndex
+        setCurrentIndex(nextIndex)
+
+        endTimeRef.current = Date.now() + duration * 1000
+        lastSecondRef.current = duration
+
+        setRemaining(duration)
     }
 
-    // TIMER AND COUNTDOWN AUDIO
+    // ACCURATE TIMER
     useEffect(() => {
         if (!isRunning || completed || !current || isSaving) return
 
-        const timer = setInterval(() => {
+        const tick = () => {
+            if (
+                !runningRef.current ||
+                completedRef.current ||
+                isSavingRef.current
+            ) {
+                return
+            }
 
-            if (remaining <= 1) {
+            if (!endTimeRef.current) {
+                endTimeRef.current = Date.now() + remaining * 1000
+            }
+
+            const millisecondsLeft = endTimeRef.current - Date.now()
+
+            const secondsLeft = Math.max(
+                0,
+                Math.ceil(millisecondsLeft / 1000)
+            )
+
+            if (secondsLeft <= 0) {
+                setRemaining(0)
                 advanceModule()
                 return
             }
 
-            const nextRemaining = remaining - 1
+            if (secondsLeft !== lastSecondRef.current) {
+                lastSecondRef.current = secondsLeft
+                setRemaining(secondsLeft)
 
-            setRemaining(nextRemaining)
+                const index = currentIndexRef.current
+                const step = steps[index]
+                const last = index === steps.length - 1
 
-            // No countdown sounds on last module
-            if (isLastStep) return
-
-            // Countdown: sound every second
-            if (current.type === 'countdown') {
-                playSound('countdown')
-                return
+                if (!last) {
+                    if (step.type === 'countdown') {
+                        playSound('countdown')
+                    } else if ([3, 2, 1].includes(secondsLeft)) {
+                        playSound('countdown')
+                    }
+                }
             }
+        }
 
-            // Work / Rest: sound at 3, 2 and 1
-            if ([3, 2, 1].includes(nextRemaining)) {
-                playSound('countdown')
-            }
+        tick()
 
-        }, 1000)
+        const timer = setInterval(tick, 100)
 
         return () => clearInterval(timer)
 
-    }, [
-        isRunning,
-        completed,
-        currentIndex,
-        current,
-        remaining,
-        isSaving,
-        isLastStep
-    ])
+    }, [isRunning, completed, currentIndex, isSaving])
+
+    // RESTORE TIMER AFTER BACKGROUND
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (
+                document.visibilityState === 'visible' &&
+                runningRef.current
+            ) {
+                if (!endTimeRef.current) return
+
+                const secondsLeft = Math.max(
+                    0,
+                    Math.ceil((endTimeRef.current - Date.now()) / 1000)
+                )
+
+                setRemaining(secondsLeft)
+                lastSecondRef.current = secondsLeft
+
+                if (secondsLeft <= 0) {
+                    advanceModule()
+                }
+
+                requestWakeLock()
+            }
+        }
+
+        document.addEventListener('visibilitychange', handleVisibility)
+
+        return () => {
+            document.removeEventListener(
+                'visibilitychange',
+                handleVisibility
+            )
+        }
+    }, [steps])
+
+    // RESTORE WAKE LOCK WHEN APP RETURNS
+    useEffect(() => {
+        const handleFocus = () => {
+            if (
+                document.visibilityState === 'visible' &&
+                runningRef.current
+            ) {
+                requestWakeLock()
+            }
+        }
+
+        window.addEventListener('focus', handleFocus)
+
+        return () => {
+            window.removeEventListener('focus', handleFocus)
+        }
+    }, [])
 
     // START / PAUSE
     const toggleTimer = async () => {
         if (completed || !current || isSaving) return
 
         if (isRunning) {
+            runningRef.current = false
             setIsRunning(false)
+
+            endTimeRef.current = null
+
+            releaseWakeLock()
             return
         }
 
-        try {
-            const context = audioContextRef.current
+        await unlockAudio()
 
-            // Unlock audio immediately from user interaction
-            const resumePromise = context?.state === 'suspended'
-                ? context.resume()
-                : Promise.resolve()
-
-            // Wait for audio files to finish decoding
-            if (audioReadyRef.current) {
-                await audioReadyRef.current
-            }
-
-            await resumePromise
-
-            setIsRunning(true)
-
-        } catch (error) {
-            console.error('Could not initialize audio:', error)
-            setIsRunning(true)
+        if (!audioReadyRef.current) {
+            console.warn('Some audio files may still be loading.')
         }
+
+        runningRef.current = true
+
+        endTimeRef.current = Date.now() + remaining * 1000
+        lastSecondRef.current = remaining
+
+        setIsRunning(true)
+
+        requestWakeLock()
     }
 
     // NEXT MODULE
@@ -303,20 +474,37 @@ export default function WorkoutRunner({ workout, onExit }) {
     const skipPrevious = () => {
         if (currentIndex <= 0 || isSaving) return
 
-        setCurrentIndex(index => index - 1)
+        const previousIndex = currentIndex - 1
+        const duration = steps[previousIndex].duration
+
+        currentIndexRef.current = previousIndex
+
+        setCurrentIndex(previousIndex)
+        setRemaining(duration)
+
+        endTimeRef.current = isRunning
+            ? Date.now() + duration * 1000
+            : null
+
+        lastSecondRef.current = duration
     }
 
     // RESTART
     const restart = () => {
         if (isSaving) return
 
-        if (activeSourceRef.current) {
-            try {
-                activeSourceRef.current.stop()
-            } catch {}
-
-            activeSourceRef.current = null
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause()
+            activeAudioRef.current.currentTime = 0
+            activeAudioRef.current = null
         }
+
+        runningRef.current = false
+        completedRef.current = false
+        currentIndexRef.current = 0
+
+        endTimeRef.current = null
+        lastSecondRef.current = null
 
         setIsRunning(false)
         setCurrentIndex(0)
@@ -324,12 +512,15 @@ export default function WorkoutRunner({ workout, onExit }) {
         setCompleted(false)
         setHasSaved(false)
         setSaveError('')
+
+        releaseWakeLock()
     }
 
     // FORMAT TIME
     const formatTime = seconds => {
-        const minutes = Math.floor(seconds / 60)
-        const remainingSeconds = seconds % 60
+        const safeSeconds = Math.max(0, seconds)
+        const minutes = Math.floor(safeSeconds / 60)
+        const remainingSeconds = safeSeconds % 60
 
         return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
     }
@@ -418,6 +609,8 @@ export default function WorkoutRunner({ workout, onExit }) {
                     className="runner-back"
                     onClick={() => {
                         if (window.confirm('Exit this workout?')) {
+                            runningRef.current = false
+                            releaseWakeLock()
                             onExit()
                         }
                     }}
@@ -561,6 +754,8 @@ export default function WorkoutRunner({ workout, onExit }) {
                 className="runner-exit"
                 onClick={() => {
                     if (window.confirm('End this workout?')) {
+                        runningRef.current = false
+                        releaseWakeLock()
                         onExit()
                     }
                 }}
