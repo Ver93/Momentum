@@ -2,12 +2,6 @@
 import { supabase } from '../db/supabase'
 
 export async function register(email, password, username) {
-  const cleanUsername = (username || '').trim()
-
-  if (cleanUsername.length < 3) {
-    throw new Error('Username must have at least 3 characters.')
-  }
-
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
