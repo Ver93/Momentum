@@ -3,7 +3,7 @@ name: Deploy Momentum Web Application
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
 
   workflow_dispatch:
 
