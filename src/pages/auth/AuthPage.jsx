@@ -20,7 +20,6 @@ export default function AuthPage() {
         const data = await register(
           form.email.trim(),
           form.password,
-          (form.username || '').trim()
         )
 
         setMessage(

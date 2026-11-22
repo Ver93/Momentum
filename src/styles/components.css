@@ -402,7 +402,9 @@ input {
   border-color: var(--error);
 }
 
-/* MOBILE HEADER */
+/* ========================================
+   MOBILE HEADER
+======================================== */
 
 .mobile-header {
   display: flex;
@@ -429,12 +431,16 @@ input {
   right: 0;
   bottom: 0;
   left: 0;
+
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 4px;
-  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  gap: 2px;
+  padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+
   background: rgba(17, 22, 25, 0.96);
   border-top: 1px solid var(--border);
+
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -444,29 +450,43 @@ input {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   gap: 5px;
   min-width: 0;
   min-height: 54px;
+  padding: 4px 0;
+
   border: none;
   border-radius: var(--radius-md);
+
   color: var(--text-muted);
   background: transparent;
+
   transition: 0.2s ease;
 }
 
 .mobile-nav-item span {
-  font-size: 21px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .mobile-nav-item small {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .mobile-nav-item.active {
   color: var(--accent);
   background: var(--accent-muted);
+}
+
+/* ========================================
+   STATISTICS NAVIGATION
+======================================== */
+
+.mobile-nav-item:active {
+  transform: scale(0.96);
 }
 
 /* ========================================

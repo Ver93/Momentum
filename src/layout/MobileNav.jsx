@@ -1,8 +1,10 @@
+
 const navigation = [
   { id: 'home', label: 'Overview', icon: '⌂' },
   { id: 'build', label: 'Build', icon: '+' },
   { id: 'log', label: 'Log', icon: '▤' },
-  { id: 'profile', label: 'Profile', icon: '○' }
+  { id: 'statistics', label: 'Statistics', icon: '▥' },
+  { id: 'profile', label: 'Profile', icon: '○' },
 ]
 
 export default function MobileNav({
@@ -15,7 +17,9 @@ export default function MobileNav({
         <button
           key={item.id}
           type="button"
-          className={`mobile-nav-item ${activePage === item.id ? 'active' : ''}`}
+          className={`mobile-nav-item ${
+            activePage === item.id ? 'active' : ''
+          }`}
           onClick={() => setActivePage(item.id)}
         >
           <span>{item.icon}</span>

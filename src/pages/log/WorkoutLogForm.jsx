@@ -1,18 +1,53 @@
 
 import { useState } from 'react'
 
+const getLocalDate = date => {
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+}
+
 const newExercise = () => ({
     id: crypto.randomUUID(),
     exercise_name: '',
     sets: [{ reps: '', weight: '' }]
 })
 
-export default function WorkoutLogForm({ onSave, onClose, saving }) {
-    const [name, setName] = useState('')
-    const [date, setDate] = useState(
-        new Date().toLocaleDateString('en-CA')
+export default function WorkoutLogForm({
+    onSave,
+    onClose,
+    saving,
+    initialWorkout,
+    isRepeat = false
+}) {
+    const [name, setName] = useState(
+        initialWorkout?.workout_name || ''
     )
-    const [exercises, setExercises] = useState([newExercise()])
+
+    const [date, setDate] = useState(
+        isRepeat
+            ? getLocalDate(new Date())
+            : initialWorkout
+                ? getLocalDate(initialWorkout.completed_at)
+                : getLocalDate(new Date())
+    )
+
+    const [exercises, setExercises] = useState(
+        initialWorkout
+            ? (initialWorkout.workout_exercises || []).map(exercise => ({
+                id: exercise.id || crypto.randomUUID(),
+                exercise_name: exercise.exercise_name,
+                sets: (exercise.sets || []).map(set => ({
+                    reps: String(set.reps),
+                    weight: String(set.weight)
+                }))
+            }))
+            : [newExercise()]
+    )
+
     const [error, setError] = useState('')
 
     const updateExercise = (id, field, value) => {
@@ -58,7 +93,10 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                 exercise.id === id
                     ? {
                         ...exercise,
-                        sets: [...exercise.sets, { reps: '', weight: '' }]
+                        sets: [
+                            ...exercise.sets,
+                            { reps: '', weight: '' }
+                        ]
                     }
                     : exercise
             )
@@ -71,7 +109,9 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                 exercise.id === id
                     ? {
                         ...exercise,
-                        sets: exercise.sets.filter((_, i) => i !== index)
+                        sets: exercise.sets.filter(
+                            (_, i) => i !== index
+                        )
                     }
                     : exercise
             )
@@ -87,6 +127,11 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
             return
         }
 
+        if (!date || date > getLocalDate(new Date())) {
+            setError('Choose a valid workout date.')
+            return
+        }
+
         const validExercises = exercises.filter(
             exercise => exercise.exercise_name.trim()
         )
@@ -97,42 +142,77 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
         }
 
         for (const exercise of validExercises) {
-            if (!exercise.sets.length || exercise.sets.some(set =>
-                set.reps === '' ||
-                !Number.isInteger(Number(set.reps)) ||
-                Number(set.reps) <= 0 ||
-                set.weight === '' ||
-                !Number.isFinite(Number(set.weight)) ||
-                Number(set.weight) < 0
-            )) {
+            if (
+                !exercise.sets.length ||
+                exercise.sets.some(set =>
+                    set.reps === '' ||
+                    !Number.isInteger(Number(set.reps)) ||
+                    Number(set.reps) <= 0 ||
+                    set.weight === '' ||
+                    !Number.isFinite(Number(set.weight)) ||
+                    Number(set.weight) < 0
+                )
+            ) {
                 setError(`Check sets for ${exercise.exercise_name}.`)
                 return
             }
         }
 
-        await onSave({
-            workout_name: name.trim(),
-            completed_at: new Date(`${date}T12:00:00`).toISOString(),
-            duration_seconds: 0,
-            exercises: validExercises.map(exercise => ({
-                exercise_name: exercise.exercise_name.trim(),
-                sets: exercise.sets.map(set => ({
-                    reps: Number(set.reps),
-                    weight: Number(set.weight)
+        try {
+            await onSave({
+                workout_name: name.trim(),
+                completed_at: new Date(
+                    `${date}T12:00:00`
+                ).toISOString(),
+                duration_seconds:
+                    initialWorkout?.duration_seconds || 0,
+                notes: initialWorkout?.notes || null,
+                exercises: validExercises.map(exercise => ({
+                    id: exercise.id,
+                    exercise_name: exercise.exercise_name.trim(),
+                    sets: exercise.sets.map(set => ({
+                        reps: Number(set.reps),
+                        weight: Number(set.weight)
+                    }))
                 }))
-            }))
-        })
+            })
+        } catch (err) {
+            console.error(err)
+            setError(err.message || 'Could not save workout.')
+        }
     }
 
     return (
         <div className="log-modal-overlay">
             <form className="log-form" onSubmit={handleSubmit}>
                 <div className="log-form-header">
-                    <h2>Add workout</h2>
-                    <button type="button" onClick={onClose}>×</button>
+                    <h2>
+                        {isRepeat
+                            ? 'Repeat workout'
+                            : initialWorkout
+                                ? 'Edit workout'
+                                : 'Add workout'}
+                    </h2>
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={saving}
+                    >
+                        ×
+                    </button>
                 </div>
 
+                {isRepeat && (
+                    <p className="log-repeat-description">
+                        Your previous workout has been copied.
+                        You can change exercises, reps and weights
+                        before saving.
+                    </p>
+                )}
+
                 <label>Workout name</label>
+
                 <input
                     value={name}
                     onChange={e => setName(e.target.value)}
@@ -141,10 +221,11 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                 />
 
                 <label>Date</label>
+
                 <input
                     type="date"
                     value={date}
-                    max={new Date().toLocaleDateString('en-CA')}
+                    max={getLocalDate(new Date())}
                     onChange={e => setDate(e.target.value)}
                     required
                 />
@@ -153,14 +234,22 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                     <h3>Exercises</h3>
 
                     {exercises.map((exercise, exerciseIndex) => (
-                        <section className="log-exercise" key={exercise.id}>
+                        <section
+                            className="log-exercise"
+                            key={exercise.id}
+                        >
                             <div className="log-exercise-header">
-                                <span>Exercise {exerciseIndex + 1}</span>
+                                <span>
+                                    Exercise {exerciseIndex + 1}
+                                </span>
 
                                 {exercises.length > 1 && (
                                     <button
                                         type="button"
-                                        onClick={() => removeExercise(exercise.id)}
+                                        onClick={() =>
+                                            removeExercise(exercise.id)
+                                        }
+                                        disabled={saving}
                                     >
                                         Remove
                                     </button>
@@ -188,7 +277,10 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                             </div>
 
                             {exercise.sets.map((set, index) => (
-                                <div className="log-set-row" key={index}>
+                                <div
+                                    className="log-set-row"
+                                    key={index}
+                                >
                                     <span>{index + 1}</span>
 
                                     <input
@@ -227,8 +319,13 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
 
                                     <button
                                         type="button"
-                                        disabled={exercise.sets.length === 1}
-                                        onClick={() => removeSet(exercise.id, index)}
+                                        disabled={
+                                            exercise.sets.length === 1 ||
+                                            saving
+                                        }
+                                        onClick={() =>
+                                            removeSet(exercise.id, index)
+                                        }
                                     >
                                         ×
                                     </button>
@@ -239,6 +336,7 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                                 className="log-add-set"
                                 type="button"
                                 onClick={() => addSet(exercise.id)}
+                                disabled={saving}
                             >
                                 + Add set
                             </button>
@@ -249,19 +347,28 @@ export default function WorkoutLogForm({ onSave, onClose, saving }) {
                         className="log-add-exercise"
                         type="button"
                         onClick={addExercise}
+                        disabled={saving}
                     >
                         + Add exercise
                     </button>
                 </div>
 
-                {error && <p className="log-error">{error}</p>}
+                {error && (
+                    <p className="log-error">{error}</p>
+                )}
 
                 <button
                     className="log-save-button"
                     type="submit"
                     disabled={saving}
                 >
-                    {saving ? 'Saving...' : 'Save workout'}
+                    {saving
+                        ? 'Saving...'
+                        : isRepeat
+                            ? 'Save repeated workout'
+                            : initialWorkout
+                                ? 'Save changes'
+                                : 'Save workout'}
                 </button>
             </form>
         </div>

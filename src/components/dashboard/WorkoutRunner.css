@@ -272,7 +272,8 @@
 .runner-exit {
   min-height: 42px;
   border: none;
-  background: transparent;
+  /* background: transparent; */
+  border-radius: 9px;
   color: #dc5555;
   font-size: 12px;
   font-weight: 700;

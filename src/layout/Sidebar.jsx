@@ -4,6 +4,7 @@ const navigation = [
   { id: 'home', label: 'Overview', icon: '⌂' },
   { id: 'build', label: 'Build', icon: '+' },
   { id: 'log', label: 'Log', icon: '▤' },
+  { id: 'statistics', label: 'Statistics', icon: '▥' },
   { id: 'profile', label: 'Profile', icon: '○' }
 ]
 

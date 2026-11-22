@@ -1,0 +1,506 @@
+
+/* ========================================
+   PAGE
+======================================== */
+
+.statistics-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+    color: #f5f5f5;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
+.statistics-header {
+    margin-bottom: 32px;
+}
+
+.statistics-eyebrow {
+    color: #8b8b8b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.statistics-header h1 {
+    font-size: 32px;
+    margin: 8px 0;
+    font-weight: 700;
+}
+
+.statistics-header p,
+.statistics-exercise-header p,
+.statistics-section-heading p {
+    color: #858585;
+    font-size: 14px;
+    margin: 0;
+}
+
+.statistics-loading,
+.statistics-error {
+    padding: 40px;
+    text-align: center;
+    color: #aaa;
+}
+
+.statistics-error {
+    color: #ff6b6b;
+}
+
+/* ========================================
+   FILTERS
+======================================== */
+
+.statistics-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.statistics-periods {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    background: #171717;
+    border: 1px solid #292929;
+    border-radius: 10px;
+}
+
+.statistics-periods button {
+    border: none;
+    background: transparent;
+    color: #999;
+    padding: 9px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.statistics-periods button:hover {
+    color: white;
+}
+
+.statistics-periods button.active {
+    background: #c5f36b;
+    color: #111;
+    font-weight: 700;
+}
+
+/* ========================================
+   SELECTORS
+======================================== */
+
+.statistics-selectors {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.statistics-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+}
+
+.statistics-selector label {
+    color: #999;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.statistics-selector select {
+    width: 100%;
+    background: #171717;
+    color: #eee;
+    border: 1px solid #303030;
+    border-radius: 9px;
+    padding: 13px 14px;
+    outline: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.statistics-selector select:focus {
+    border-color: #c5f36b;
+}
+
+.statistics-selector select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   EXERCISE HEADER
+======================================== */
+
+.statistics-exercise-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    margin: 0 0 20px;
+    background: #171717;
+    border: 1px solid #292929;
+    border-radius: 14px;
+}
+
+.statistics-exercise-header h2 {
+    font-size: 25px;
+    margin: 9px 0;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.statistics-exercise-header p {
+    color: #c5f36b;
+    font-size: 13px;
+    margin: 0;
+}
+
+.statistics-session-count {
+    display: block;
+    margin-top: 10px;
+    color: #777;
+    font-size: 12px;
+}
+
+/* ========================================
+   OVERVIEW CARDS
+======================================== */
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.statistics-card {
+    padding: 22px;
+    background: #171717;
+    border: 1px solid #292929;
+    border-radius: 14px;
+    min-width: 0;
+    transition: border-color 0.2s;
+}
+
+.statistics-card:hover {
+    border-color: #444;
+}
+
+.statistics-card p {
+    color: #999;
+    font-size: 13px;
+    margin: 0 0 13px;
+}
+
+.statistics-card h2 {
+    font-size: 27px;
+    margin: 0;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.statistics-card h2 small {
+    font-size: 13px;
+    color: #999;
+}
+
+.statistics-card-sub {
+    display: block;
+    color: #707070;
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+/* ========================================
+   CHART LAYOUT
+======================================== */
+
+.statistics-charts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.statistics-section {
+    background: #171717;
+    border: 1px solid #292929;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 20px;
+    min-width: 0;
+}
+
+.statistics-chart-card {
+    margin-bottom: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.statistics-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.statistics-section-heading h2 {
+    font-size: 17px;
+    margin: 0 0 7px;
+}
+
+.statistics-section-heading p {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.chart-latest {
+    color: #c5f36b;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.progression-chart {
+    width: 100%;
+    height: 230px;
+    min-width: 0;
+}
+
+.statistics-empty {
+    color: #777;
+    text-align: center;
+    padding: 35px 10px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ========================================
+   RECHARTS
+======================================== */
+
+.recharts-tooltip-wrapper {
+    outline: none;
+}
+
+.recharts-cartesian-grid-horizontal line {
+    stroke: #303030;
+}
+
+.recharts-cartesian-axis-tick text {
+    fill: #888;
+}
+
+.recharts-line path {
+    transition: stroke 0.2s;
+}
+
+/* ========================================
+   EXERCISE HISTORY
+======================================== */
+
+.exercise-history {
+    display: flex;
+    flex-direction: column;
+}
+
+.exercise-history-item {
+    padding: 17px 0;
+    border-bottom: 1px solid #292929;
+}
+
+.exercise-history-item:last-child {
+    border-bottom: none;
+}
+
+.exercise-history-date {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.exercise-history-date strong {
+    font-size: 13px;
+    color: #eee;
+}
+
+.exercise-history-date span {
+    color: #858585;
+    font-size: 11px;
+}
+
+.exercise-history-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.exercise-history-stats div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.exercise-history-stats span {
+    font-size: 11px;
+    color: #777;
+}
+
+.exercise-history-stats strong {
+    font-size: 13px;
+    color: #eee;
+    overflow-wrap: anywhere;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 900px) {
+    .statistics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 380px) {
+    .statistics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   RESPONSIVE TABLET
+======================================== */
+
+@media (max-width: 900px) {
+    .statistics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .statistics-charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   RESPONSIVE MOBILE
+======================================== */
+
+@media (max-width: 600px) {
+    .statistics-page {
+        padding: 18px;
+    }
+
+    .statistics-header h1 {
+        font-size: 27px;
+    }
+
+    .statistics-filters {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .statistics-periods {
+        justify-content: space-between;
+    }
+
+    .statistics-periods button {
+        flex: 1;
+        padding: 9px 7px;
+    }
+
+    .statistics-selectors {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .statistics-grid {
+        gap: 10px;
+    }
+
+    .statistics-card {
+        padding: 16px;
+    }
+
+    .statistics-card h2 {
+        font-size: 22px;
+    }
+
+    .statistics-section {
+        padding: 18px;
+    }
+
+    .statistics-exercise-header {
+        padding: 18px;
+    }
+
+    .statistics-exercise-header h2 {
+        font-size: 21px;
+    }
+
+    .statistics-section-heading {
+        align-items: flex-start;
+    }
+
+    .statistics-section-heading h2 {
+        font-size: 15px;
+    }
+
+    .chart-latest {
+        font-size: 13px;
+    }
+
+    .progression-chart {
+        height: 210px;
+    }
+
+    .exercise-history-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: 16px;
+    }
+}
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 380px) {
+    .statistics-page {
+        padding: 14px;
+    }
+
+    .statistics-card {
+        padding: 13px;
+    }
+
+    .statistics-card h2 {
+        font-size: 19px;
+    }
+
+    .statistics-section {
+        padding: 14px;
+    }
+
+    .statistics-periods button {
+        font-size: 11px;
+        padding: 8px 5px;
+    }
+}
