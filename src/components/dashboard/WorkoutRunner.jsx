@@ -12,23 +12,54 @@ export default function WorkoutRunner({ workout, onExit }) {
         finish: '/momentum/sounds/finish.mp3'
     }
 
-    const audioRef = useRef(null)
+    const audioRef = useRef({})
+    const activeAudioRef = useRef(null)
 
-    const playSound = async name => {
-        // Stop previous sound to prevent overlapping audio
-        if (audioRef.current) {
-            audioRef.current.pause()
-            audioRef.current.currentTime = 0
+    // PRELOAD ALL AUDIO
+    useEffect(() => {
+        Object.entries(audioPaths).forEach(([name, path]) => {
+            const audio = new Audio()
+
+            audio.src = path
+            audio.preload = 'auto'
+            audio.load()
+
+            audioRef.current[name] = audio
+        })
+
+        return () => {
+            Object.values(audioRef.current).forEach(audio => {
+                audio.pause()
+                audio.removeAttribute('src')
+                audio.load()
+            })
+
+            audioRef.current = {}
+            activeAudioRef.current = null
+        }
+    }, [])
+
+    // PLAY SOUND
+    const playSound = name => {
+        const audio = audioRef.current[name]
+
+        if (!audio) return
+
+        // Stop previous sound
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause()
+            activeAudioRef.current.currentTime = 0
         }
 
-        const audio = new Audio(audioPaths[name])
+        audio.currentTime = 0
+        activeAudioRef.current = audio
 
-        audioRef.current = audio
+        const playPromise = audio.play()
 
-        try {
-            await audio.play()
-        } catch (error) {
-            console.warn(`Could not play ${name}:`, error)
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn(`Could not play ${name}:`, error)
+            })
         }
     }
 
@@ -147,19 +178,17 @@ export default function WorkoutRunner({ workout, onExit }) {
             return
         }
 
-        // Exactly one start sound per transition
         playSound('start')
 
         setCurrentIndex(index => index + 1)
     }
 
-    // TIMER AND ALL COUNTDOWN AUDIO
+    // TIMER AND COUNTDOWN AUDIO
     useEffect(() => {
         if (!isRunning || completed || !current || isSaving) return
 
         const timer = setInterval(() => {
 
-            // Never beep at zero
             if (remaining <= 1) {
                 advanceModule()
                 return
@@ -169,7 +198,7 @@ export default function WorkoutRunner({ workout, onExit }) {
 
             setRemaining(nextRemaining)
 
-            // Last module: no countdown beeps
+            // No countdown beeps on last module
             if (isLastStep) return
 
             // Countdown module: beep every second
@@ -222,9 +251,10 @@ export default function WorkoutRunner({ workout, onExit }) {
     const restart = () => {
         if (isSaving) return
 
-        if (audioRef.current) {
-            audioRef.current.pause()
-            audioRef.current.currentTime = 0
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause()
+            activeAudioRef.current.currentTime = 0
+            activeAudioRef.current = null
         }
 
         setIsRunning(false)
