@@ -10,130 +10,125 @@ export default function AuthForm({
   loading
 }) {
   const [form, setForm] = useState({
-    // username: '',
+    username: '',
     email: '',
     password: ''
   })
 
-  function update(field, value) {
-    setForm(prev => ({ ...prev, [field]: value }))
+  function handleChange(e) {
+    const { name, value } = e.target
+
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   function handleSubmit(e) {
     e.preventDefault()
-    onSubmit(form)
+
+    onSubmit({
+      username: form.username,
+      email: form.email,
+      password: form.password
+    })
+  }
+
+  function toggleMode(value) {
+    setForm({
+      username: '',
+      email: '',
+      password: ''
+    })
+
+    setMode(value)
   }
 
   return (
-    <main className="auth-page">
-      <div className="auth-container">
+    <div className="auth-form">
 
-        <header className="auth-header">
-          <div className="auth-brand">
-            <span className="auth-brand-icon">M</span>
-            MOMENTUM
+      <div className="auth-tabs">
+        <button
+          type="button"
+          onClick={() => toggleMode('login')}
+          className={mode === 'login' ? 'active' : ''}
+        >
+          Login
+        </button>
+
+        <button
+          type="button"
+          onClick={() => toggleMode('register')}
+          className={mode === 'register' ? 'active' : ''}
+        >
+          Register
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+
+        {mode === 'register' && (
+          <div className="form-group">
+            <label>Username</label>
+
+            <input
+              type="text"
+              name="username"
+              placeholder="Choose a username"
+              value={form.username}
+              onChange={handleChange}
+              minLength={3}
+              required
+            />
           </div>
+        )}
 
-          <span className="auth-eyebrow">
-            {mode === 'login' ? 'WELCOME BACK' : 'GET STARTED'}
-          </span>
+        <div className="form-group">
+          <label>Email</label>
 
-          <h1 className="auth-title">
-            {mode === 'login'
-              ? 'Train with purpose.'
-              : 'Start your journey.'}
-          </h1>
-
-          <p className="auth-description">
-            {mode === 'login'
-              ? 'Sign in to continue your training journey.'
-              : 'Create your account and build momentum.'}
-          </p>
-        </header>
-
-        <div className="auth-tabs">
-          <button
-            type="button"
-            className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => setMode('login')}
-          >
-            Login
-          </button>
-
-          <button
-            type="button"
-            className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => setMode('register')}
-          >
-            Register
-          </button>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Password</label>
 
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={form.password}
+            onChange={handleChange}
+            minLength={8}
+            required
+          />
+        </div>
 
-          <div className="input-group">
-            <label htmlFor="email">Email address</label>
-            <input
-              id="email"
-              className="input"
-              type="email"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={e => update('email', e.target.value)}
-              autoComplete="email"
-              required
-            />
+        {message && (
+          <div className={`auth-message ${messageType}`}>
+            {message}
           </div>
+        )}
 
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              className="input"
-              type="password"
-              placeholder="Enter your password"
-              value={form.password}
-              onChange={e => update('password', e.target.value)}
-              autoComplete={
-                mode === 'login'
-                  ? 'current-password'
-                  : 'new-password'
-              }
-              minLength={mode === 'register' ? 8 : undefined}
-              required
-            />
-          </div>
+        <button
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? 'Please wait...'
+            : mode === 'register'
+              ? 'Create account'
+              : 'Login'
+          }
+        </button>
 
-          {message && (
-            <div
-              className={`message message-${messageType}`}
-              role={messageType === 'error' ? 'alert' : 'status'}
-            >
-              {message}
-            </div>
-          )}
-
-          <button
-            className="btn btn-primary auth-submit"
-            type="submit"
-            disabled={loading}
-          >
-            {loading
-              ? 'Please wait...'
-              : mode === 'login'
-                ? 'Sign in'
-                : 'Create account'}
-
-            {!loading && <span>→</span>}
-          </button>
-        </form>
-
-        <footer className="auth-footer">
-          MOMENTUM · BUILT FOR PROGRESS
-        </footer>
-
-      </div>
-    </main>
+      </form>
+    </div>
   )
 }

@@ -1,35 +1,39 @@
 
 import { supabase } from '../db/supabase'
 
-export async function login(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.trim(),
-    password
+export async function register(email, password, username) {
+  const cleanUsername = (username || '').trim()
+
+  if (cleanUsername.length < 3) {
+    throw new Error('Username must have at least 3 characters.')
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        username: cleanUsername
+      }
+    }
   })
 
-  if (error) throw new Error('Incorrect email or password.')
+  if (error) {
+    throw error
+  }
 
   return data
 }
 
-export async function register(email, password, username) {
-  if (username.trim().length < 3) {
-    throw new Error('Username must have at least 3 characters.')
-  }
-
-  if (password.length < 8) {
-    throw new Error('Password must have at least 8 characters.')
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email: email.trim(),
-    password,
-    options: {
-      data: { username: username.trim() }
-    }
+export async function login(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
   })
 
-  if (error) throw error
+  if (error) {
+    throw error
+  }
 
   return data
 }
@@ -37,5 +41,17 @@ export async function register(email, password, username) {
 export async function logout() {
   const { error } = await supabase.auth.signOut()
 
-  if (error) throw error
+  if (error) {
+    throw error
+  }
+}
+
+export async function getCurrentUser() {
+  const { data, error } = await supabase.auth.getUser()
+
+  if (error) {
+    throw error
+  }
+
+  return data.user
 }

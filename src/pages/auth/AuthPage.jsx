@@ -16,11 +16,32 @@ export default function AuthPage() {
     setMessageType('')
 
     try {
+      const email = (form.email || '').trim()
+      const password = form.password || ''
+
+      if (!email || !password) {
+        throw new Error('Email and password are required.')
+      }
+
       if (mode === 'register') {
+        const username = (form.username || '').trim()
+
+        if (username.length < 3) {
+          throw new Error(
+            'Username must have at least 3 characters.'
+          )
+        }
+
+        if (password.length < 8) {
+          throw new Error(
+            'Password must have at least 8 characters.'
+          )
+        }
+
         const data = await register(
-          form.email.trim(),
-          form.password,
-          form.username.trim()
+          email,
+          password,
+          username
         )
 
         setMessage(
@@ -31,13 +52,21 @@ export default function AuthPage() {
 
         setMessageType('success')
 
-        if (!data.session) setMode('login')
+        if (!data.session) {
+          setMode('login')
+        }
+
       } else {
-        await login(form.email.trim(), form.password)
+        await login(email, password)
       }
+
     } catch (error) {
-      setMessage(error.message || 'Something went wrong.')
+      setMessage(
+        error.message || 'Something went wrong.'
+      )
+
       setMessageType('error')
+
     } finally {
       setLoading(false)
     }
