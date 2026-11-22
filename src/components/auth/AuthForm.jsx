@@ -5,12 +5,12 @@ export default function AuthForm({
   mode,
   setMode,
   onSubmit,
+  onDemo,
   message,
   messageType,
   loading
 }) {
   const [form, setForm] = useState({
-    // username: '',
     email: '',
     password: ''
   })
@@ -71,7 +71,6 @@ export default function AuthForm({
 
         <form className="auth-form" onSubmit={handleSubmit}>
 
-
           <div className="input-group">
             <label htmlFor="email">Email address</label>
             <input
@@ -128,6 +127,20 @@ export default function AuthForm({
             {!loading && <span>→</span>}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <button
+          className="btn btn-demo"
+          type="button"
+          onClick={onDemo}
+          disabled={loading}
+        >
+          Try Demo
+          <span>→</span>
+        </button>
 
         <footer className="auth-footer">
           MOMENTUM · BUILT FOR PROGRESS

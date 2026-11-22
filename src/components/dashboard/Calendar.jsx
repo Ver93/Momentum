@@ -46,7 +46,6 @@ export default function Calendar({ logs = [] }) {
         return date
     }, [today, weekOffset])
 
-    // Group logs by calendar date
     const logsByDate = useMemo(() => {
         const grouped = new Map()
 
@@ -70,7 +69,6 @@ export default function Calendar({ logs = [] }) {
     const weekDays = useMemo(() => {
         return WEEKDAYS.map((day, index) => {
             const date = new Date(monday)
-
             date.setDate(monday.getDate() + index)
 
             const dateKey = formatDate(date)
@@ -94,10 +92,15 @@ export default function Calendar({ logs = [] }) {
         return `${minutes} min`
     }
 
+    const formatTime = date => {
+        return new Date(date).toLocaleTimeString('sv-SE', {
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    }
+
     return (
         <section className="calendar">
-
-            {/* HEADER */}
 
             <header className="calendar-header">
                 <div className="calendar-heading">
@@ -133,8 +136,6 @@ export default function Calendar({ logs = [] }) {
                 </div>
             </header>
 
-            {/* WEEK DAYS */}
-
             <div className="calendar-days">
                 {weekDays.map(item => {
                     const isSelected =
@@ -167,8 +168,6 @@ export default function Calendar({ logs = [] }) {
                 })}
             </div>
 
-            {/* SELECTED DATE */}
-
             {selectedDate && (
                 <div className="calendar-details">
 
@@ -199,72 +198,86 @@ export default function Calendar({ logs = [] }) {
 
                     {selectedLogs.length === 0 ? (
                         <div className="calendar-empty">
-                            <span className="calendar-empty-icon">
-                                <span>○</span>
-                            </span>
-
+                            <span className="calendar-empty-icon">○</span>
                             <p>No activity recorded</p>
-                            <span>Complete/log a workout to see it here.</span>
+                            <span>Complete a workout to see it here.</span>
                         </div>
                     ) : (
                         <div className="calendar-log-list">
-                            {selectedLogs.map(log => (
-                                <article
-                                    className="calendar-log"
-                                    key={log.id}
-                                >
-                                    <div className="calendar-log-icon">
-                                        <span>✓</span>
-                                    </div>
+                            {selectedLogs.map(log => {
+                                const exercises = log.workout_exercises || []
 
-                                    <div className="calendar-log-content">
-                                        <div className="calendar-log-top">
-                                            <strong>
-                                                {log.workout_name}
-                                            </strong>
+                                const totalSets = exercises.reduce(
+                                    (total, exercise) =>
+                                        total + (exercise.sets?.length || 0),
+                                    0
+                                )
 
-                                            <span className="calendar-log-status">
-                                                Completed
-                                            </span>
-                                        </div>
+                                return (
+                                    <article
+                                        className="calendar-log"
+                                        key={log.id}
+                                    >
+                                        <div className="calendar-log-header">
+                                            <div>
+                                                <h4>{log.workout_name || 'Workout'}</h4>
+                                                {/* <span>{formatTime(log.completed_at)}</span> */}
+                                            </div>
 
-                                        <div className="calendar-log-meta">
-                                            <span>
-                                                {log.workout_exercises?.length || 0} exercises
-                                            </span>
+                                            <div className="calendar-log-summary">
+                                                <span>{exercises.length} exercises</span>
+                                                <span>{totalSets} sets</span>
 
-                                            {log.duration_seconds != null && (
-                                                <>
-                                                    <span className="calendar-meta-dot" />
+                                                {log.duration_seconds != null && (
                                                     <span>
                                                         {formatDuration(log.duration_seconds)}
                                                     </span>
-                                                </>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
 
-                                        {log.workout_exercises?.length > 0 && (
+                                        {exercises.length > 0 && (
                                             <div className="calendar-exercises">
-                                                {log.workout_exercises.map(exercise => (
-                                                    <div key={exercise.id}>
-                                                        <span>
+                                                {exercises.map(exercise => (
+                                                    <div
+                                                        className="calendar-exercise"
+                                                        key={exercise.id}
+                                                    >
+                                                        <strong>
                                                             {exercise.exercise_name}
-                                                        </span>
+                                                        </strong>
 
-                                                        <small>
-                                                            {exercise.sets?.length || 0} sets
-                                                        </small>
+                                                        <div className="calendar-exercise-sets">
+                                                            {(exercise.sets || []).map((set, index) => (
+                                                                <div
+                                                                    className="calendar-exercise-set"
+                                                                    key={set.id || index}
+                                                                >
+                                                                    <span>Set {index + 1}</span>
+                                                                    <span>{set.reps ?? 0} reps</span>
+                                                                    <strong>{set.weight ?? 0} kg</strong>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         )}
-                                    </div>
-                                </article>
-                            ))}
+                                    </article>
+                                )
+                            })}
                         </div>
                     )}
                 </div>
             )}
+
+            <footer className="calendar-footer">
+                <span>
+                    <i />
+                    Training completed
+                </span>
+                <span>{logs.length} total workouts</span>
+            </footer>
 
         </section>
     )

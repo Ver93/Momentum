@@ -105,6 +105,56 @@
   text-align: center;
 }
 
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 24px 0;
+  color: #777;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-demo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid rgba(183, 243, 107, 0.35);
+  border-radius: 8px;
+  color: #B7F36B;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-demo:hover {
+  background: rgba(183, 243, 107, 0.08);
+  border-color: #B7F36B;
+}
+
+.btn-demo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-demo span {
+  font-size: 18px;
+}
+
+
 @media (min-width: 768px) {
   .auth-page {
     padding: var(--space-7);

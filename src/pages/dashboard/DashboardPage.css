@@ -1,212 +1,584 @@
 
+/* =========================
+   DASHBOARD PAGE
+========================= */
+
 .dashboard-page {
-  width: 100%;
-  padding: 32px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    box-sizing: border-box;
 }
 
-.dashboard-page h1 {
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.dashboard-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-
-/* =================================
-   DASHBOARD WORKOUTS
-================================= */
-
-.dashboard-workouts {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 26px;
-}
+/* =========================
+   SECTION HEADINGS
+========================= */
 
 .dashboard-section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
 }
 
 .dashboard-section-heading h2 {
-  margin: 0;
-  font-size: 19px;
-  font-weight: 750;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 650;
+    color: var(--text-primary);
 }
 
 .dashboard-section-heading p {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: 12px;
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.workout-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* =========================
+   WORKOUT LIBRARY
+========================= */
+
+.dashboard-workouts {
+    width: 100%;
 }
 
 .dashboard-workout-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
 }
+
+/* =========================
+   WORKOUT CARD
+========================= */
 
 .dashboard-workout-card {
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--bg-secondary);
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg-secondary);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
 }
 
-.dashboard-workout-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+.dashboard-workout-card:hover {
+    border-color: var(--text-secondary);
 }
 
-.dashboard-workout-top h3 {
-  margin: 0 0 5px;
-  font-size: 16px;
-  overflow-wrap: anywhere;
+.workout-card-header {
+    width: 100%;
+    min-height: 76px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
 }
 
-.dashboard-workout-top span {
-  color: var(--text-muted);
-  font-size: 11px;
+.workout-card-main {
+    min-width: 0;
 }
 
-.dashboard-workout-time {
-  flex-shrink: 0;
-  font-size: 17px !important;
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
+.workout-card-main h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 650;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
 }
 
-.dashboard-timeline {
-  display: flex;
-  width: 100%;
-  height: 30px;
-  gap: 4px;
-  overflow: hidden;
+.workout-card-main span {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
-.dashboard-timeline-segment {
-  min-width: 3px;
-  border-radius: 3px;
+.workout-card-summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
 }
 
-.dashboard-timeline-segment.work {
-  background: #16a34a;
+.workout-card-summary strong {
+    font-size: 17px;
+    font-weight: 650;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
-.dashboard-timeline-segment.rest {
-  background: #2563eb;
+.workout-card-chevron {
+    display: inline-block;
+    color: var(--text-secondary);
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.workout-card-chevron.open {
+    transform: rotate(180deg);
+}
+
+/* =========================
+   EXPANDED WORKOUT DETAILS
+========================= */
+
+.workout-card-details {
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--border);
+}
+
+.workout-timeline {
+    width: 100%;
+    margin: 18px 0;
+}
+
+.workout-timeline-track {
+    width: 100%;
+    height: 9px;
+    display: flex;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--border);
+}
+
+.workout-timeline-segment {
+    min-width: 2px;
+    height: 100%;
+}
+
+.workout-timeline-segment.work {
+    background: #b7f36b;
+}
+
+.workout-timeline-segment.rest {
+    background: #64748b;
 }
 
 .dashboard-no-modules {
-  color: var(--text-muted);
-  font-size: 12px;
+    padding: 14px 0;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
-.dashboard-workout-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* =========================
+   WORKOUT STATS
+========================= */
+
+.workout-card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
 }
 
-.dashboard-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
+.workout-card-stats > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
 }
 
-.dashboard-legend span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-secondary);
-  font-size: 11px;
+.workout-card-stats span {
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.7px;
 }
 
-.dashboard-legend i {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
+.workout-card-stats strong {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
 }
 
-.legend-work-dot {
-  background: #16a34a;
-}
-
-.legend-rest-dot {
-  background: #2563eb;
-}
+/* =========================
+   START WORKOUT BUTTON
+========================= */
 
 .dashboard-use-button {
-  width: 100%;
-  min-height: 46px;
-  padding: 0 13px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 750;
-  cursor: pointer;
+    width: 100%;
+    min-height: 42px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 0;
+    border-radius: 5px;
+    background: #b7f36b;
+    color: #17210d;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.dashboard-use-button:active {
-  background: var(--bg-primary);
+.dashboard-use-button:hover:not(:disabled) {
+    background: #c9ff85;
 }
 
 .dashboard-use-button:disabled {
-  opacity: .4;
-  cursor: default;
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
-.dashboard-use-button span {
-  font-size: 19px;
+/* =========================
+   RECENT ACTIVITY
+========================= */
+
+.dashboard-recent-logs {
+    width: 100%;
 }
+
+.dashboard-view-all {
+    padding: 7px 0 7px 10px;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.dashboard-view-all:hover {
+    color: var(--text-primary);
+}
+
+.dashboard-log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dashboard-log-card {
+    min-height: 68px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg-secondary);
+    transition: border-color 0.2s ease;
+}
+
+.dashboard-log-card:hover {
+    border-color: var(--text-secondary);
+}
+
+.dashboard-log-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dashboard-log-info strong {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-log-info span {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.dashboard-log-duration {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.dashboard-log-duration strong {
+    color: var(--text-primary);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard-log-duration span {
+    color: var(--text-secondary);
+    font-size: 10px;
+}
+
+/* =========================
+   EMPTY STATES
+========================= */
 
 .dashboard-empty {
-  min-height: 130px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  color: var(--text-muted);
-  font-size: 13px;
-  text-align: center;
+    padding: 28px 20px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-align: center;
 }
 
 .dashboard-empty strong {
-  color: var(--text-primary);
+    display: block;
+    margin-bottom: 7px;
+    color: var(--text-primary);
+    font-size: 15px;
+}
+
+.dashboard-empty p {
+    margin: 0 0 15px;
 }
 
 .dashboard-empty button {
-  min-height: 40px;
-  padding: 0 18px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-weight: 700;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 5px;
+    background: #b7f36b;
+    color: #17210d;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+/* =========================
+   RECENT ACTIVITY
+========================= */
+
+.dashboard-recent-logs {
+    margin-top: 48px;
+}
+
+.recent-logs-view-all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.recent-logs-view-all:hover {
+    background: var(--bg-tertiary);
+}
+
+.recent-workout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.recent-workout {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-secondary);
+}
+
+.recent-workout-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.recent-workout-toggle:hover {
+    background: var(--bg-tertiary);
+}
+
+.recent-workout-heading {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recent-workout-title {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.recent-workout-title h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.recent-workout-title span {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.recent-workout-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.recent-workout-summary span {
+    padding: 5px 9px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.recent-workout-chevron {
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    font-size: 23px;
+    transition: transform 0.2s ease;
+}
+
+.recent-workout-chevron.open {
+    transform: rotate(180deg);
+}
+
+.recent-workout-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.recent-exercise {
+    padding-top: 18px;
+}
+
+.recent-exercise h4 {
+    margin: 0 0 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.recent-exercise-sets {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.recent-exercise-set {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.recent-exercise-set strong {
+    color: var(--text-primary);
+    text-align: right;
+    font-weight: 600;
+}
+
+.recent-set-number {
+    color: var(--text-secondary);
+}
+
+.recent-exercise-empty,
+.recent-workout-empty {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .dashboard-recent-logs {
+        margin-top: 36px;
+    }
+
+    .recent-workout-toggle {
+        padding: 16px;
+    }
+
+    .recent-workout-details {
+        padding: 0 16px 16px;
+    }
+
+    .recent-exercise-set {
+        grid-template-columns: 1fr 1fr auto;
+        gap: 8px;
+    }
 }
 
 
-@media (max-width: 767px) {
-  .dashboard-page {
-    padding: 20px;
-  }
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+    .dashboard-page {
+        padding: 20px 14px;
+        gap: 30px;
+    }
+
+    .dashboard-workout-list {
+        grid-template-columns: 1fr;
+    }
+
+    .workout-card-stats {
+        gap: 7px;
+    }
+
+    .workout-card-stats > div {
+        padding: 10px 8px;
+    }
+
+    .workout-card-stats strong {
+        font-size: 14px;
+    }
+
+    .dashboard-log-card {
+        padding: 13px;
+    }
 }

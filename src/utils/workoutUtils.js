@@ -33,23 +33,33 @@ export const formatTime = seconds => {
   return `${minutes}m ${remaining}s`
 }
 
-export const getWorkoutStats = sequences => {
+export const getWorkoutStats = workoutOrSequences => {
+  const sequences = Array.isArray(workoutOrSequences)
+    ? workoutOrSequences
+    : workoutOrSequences?.sequences || []
+
   let work = 0
   let rest = 0
   let modules = 0
 
+  const timeline = []
+
   sequences.forEach(sequence => {
-    const rounds = Number(sequence.rounds) || 1
+    const rounds = Math.max(1, Number(sequence.rounds) || 1)
 
     sequence.modules?.forEach(module => {
-      const duration = Number(module.duration) || 0
+      const duration = Math.max(0, Number(module.duration) || 0)
 
-      modules++
+      modules += rounds
 
       if (module.type === 'work') {
         work += duration * rounds
-      } else {
+      } else if (module.type === 'rest') {
         rest += duration * rounds
+      }
+
+      for (let round = 0; round < rounds; round++) {
+        timeline.push(module)
       }
     })
   })
@@ -58,7 +68,12 @@ export const getWorkoutStats = sequences => {
     work,
     rest,
     total: work + rest,
-    modules
+    modules,
+    totalWork: work,
+    totalRest: rest,
+    totalDuration: work + rest,
+    totalModules: modules,
+    timeline
   }
 }
 
@@ -71,14 +86,7 @@ export const getTotalRounds = sequences => {
 }
 
 export const getTimelineModules = sequences => {
-  return sequences.flatMap(sequence =>
-    (sequence.modules || []).flatMap(module =>
-      Array.from(
-        { length: Number(sequence.rounds) || 1 },
-        () => module
-      )
-    )
-  )
+  return getWorkoutStats(sequences).timeline
 }
 
 export const prepareWorkoutData = (name, sequences) => ({
